@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Schedule Planner</title>
+</head>
+<body>
+  <h1>Study Schedule Planner</h1>
+  <form id="scheduleForm">
+    <label>
+      Exam Date:<br />
+      <input type="date" id="exam_date" name="exam_date" required />
+    </label>
+    <br /><br />
+    <label>
+      Study Hours per Week:<br />
+      <input type="number" id="study_hours_per_week" name="study_hours_per_week" required min="0" step="0.1" />
+    </label>
+    <br /><br />
+    <label>
+      Syllabus Content:<br />
+      <textarea id="syllabus_content" name="syllabus_content" rows="6" cols="40" required></textarea>
+    </label>
+    <br /><br />
+    <button type="submit">Generate Schedule</button>
+  </form>
+
+  <h2>Result:</h2>
+  <pre id="result"></pre>
+
+  <script>
+    const form = document.getElementById('scheduleForm');
+    const resultEl = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const exam_date = document.getElementById('exam_date').value;
+      const study_hours_per_week = parseFloat(document.getElementById('study_hours_per_week').value);
+      const syllabus_content = document.getElementById('syllabus_content').value;
+
+      const payload = { exam_date, study_hours_per_week, syllabus_content };
+
+      resultEl.textContent = 'Loading...';
+
+      try {
+        const response = await fetch('https://ai-calendar-production-94d1.up.railway.app/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          resultEl.textContent = 'Error: ' + (errorData.error || response.statusText);
+          return;
+        }
+
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultEl.textContent = 'Request failed: ' + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
