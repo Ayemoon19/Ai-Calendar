@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 # Import your class from the calendar file (filename must match here)
 from A_level_calender import StudySchedulePlanner  
 import datetime
 
 app = Flask(__name__)
+CORS(app)
 from flask import send_from_directory
 
 @app.route("/")
